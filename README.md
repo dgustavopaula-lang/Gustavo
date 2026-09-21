@@ -1,4 +1,4 @@
-# Gustavo Santos | Philosopher Who Codes 🧠⚡
+# Gustavo Santos | Philosopher Who Codes 
 
 > Traduzo problemas operacionais complexos em sistemas digitais leves, funcionais e orientados a resultados. Fundador da **GPS.dev**.
 
