@@ -1,0 +1,11 @@
+{
+  "name": "Raiz Hotel",
+  "short_name": "Raiz Hotel",
+  "description": "Reservas, quartos e hóspedes do seu hotel ou pousada, direto no celular.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f8f5",
+  "theme_color": "#14452f",
+  "lang": "pt-BR"
+}
