@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raiz Hotel | GPS.dev</title>
+<meta name="theme-color" content="#14452f">
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--verde:#14452f;--verde2:#1c6b48;--laranja:#f26b1d;--fundo:#f4f8f5;--txt:#1b2a22;--cinza:#5b6b62;--borda:#dbe5de;--ok:#1c8a55;--erro:#c0392b}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--fundo);color:var(--txt)}
+header{background:var(--verde);color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+header h1{margin:0;font-size:1.15rem}header h1 span{color:var(--laranja)}
+nav{display:flex;gap:6px;padding:10px 12px;overflow-x:auto;background:#fff;border-bottom:1px solid var(--borda)}
+nav button{border:0;background:var(--fundo);padding:10px 14px;border-radius:10px;font-weight:600;color:var(--verde);white-space:nowrap;cursor:pointer}
+nav button.on{background:var(--verde);color:#fff}
+main{max-width:900px;margin:0 auto;padding:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.card{background:#fff;border:1px solid var(--borda);border-radius:14px;padding:14px}
+.card b{display:block;font-size:1.6rem;color:var(--verde)}.card small{color:var(--cinza)}
+.box{background:#fff;border:1px solid var(--borda);border-radius:14px;padding:14px;margin-bottom:14px}
+h2{margin:0 0 10px;font-size:1.05rem;color:var(--verde)}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+label{font-size:.8rem;color:var(--cinza);display:flex;flex-direction:column;gap:3px}
+input,select{padding:10px;border:1px solid var(--borda);border-radius:9px;font-size:1rem;width:100%}
+.btn{background:var(--laranja);color:#fff;border:0;border-radius:10px;padding:11px 14px;font-weight:700;cursor:pointer;font-size:1rem}
+.btn.sec{background:var(--verde)}.btn.peq{padding:6px 10px;font-size:.85rem}.btn.perigo{background:var(--erro)}
+.lista{display:grid;gap:8px}
+.item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px;border:1px solid var(--borda);border-radius:10px;flex-wrap:wrap}
+.tag{padding:3px 9px;border-radius:99px;font-size:.75rem;font-weight:700;color:#fff}
+.livre{background:var(--ok)}.ocupado{background:var(--erro)}.reservado{background:var(--laranja)}.limpeza{background:#7a8a82}
+.msg{color:var(--erro);font-size:.9rem;min-height:1.2em;margin-top:6px}
+.vazio{color:var(--cinza);text-align:center;padding:14px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header><h1>Raiz <span>Hotel</span></h1><small id="hoje"></small></header>
+<nav id="abas">
+  <button data-aba="painel" class="on">Painel</button>
+  <button data-aba="reservas">Reservas</button>
+  <button data-aba="quartos">Quartos</button>
+  <button data-aba="hospedes">Hóspedes</button>
+</nav>
+<main>
+  <section id="painel">
+    <div class="cards" id="cards"></div>
+    <div class="box"><h2>Chegadas de hoje</h2><div class="lista" id="chegadas"></div></div>
+    <div class="box"><h2>Saídas de hoje</h2><div class="lista" id="saidas"></div></div>
+  </section>
+
+  <section id="reservas" hidden>
+    <div class="box"><h2>Nova reserva</h2>
+      <form id="fReserva">
+        <label>Hóspede<select id="rHosp" required></select></label>
+        <label>Quarto<select id="rQuarto" required></select></label>
+        <label>Entrada<input type="date" id="rIn" required></label>
+        <label>Saída<input type="date" id="rOut" required></label>
+        <label style="justify-content:flex-end"><button class="btn" type="submit">Reservar</button></label>
+      </form>
+      <div class="msg" id="rMsg"></div>
+    </div>
+    <div class="box"><h2>Reservas</h2><div class="lista" id="listaReservas"></div></div>
+  </section>
+
+  <section id="quartos" hidden>
+    <div class="box"><h2>Novo quarto</h2>
+      <form id="fQuarto">
+        <label>Número<input id="qNum" required maxlength="10"></label>
+        <label>Tipo<select id="qTipo"><option>Solteiro</option><option>Casal</option><option>Família</option><option>Suíte</option></select></label>
+        <label>Diária (R$)<input type="number" id="qPreco" min="0" step="0.01" required></label>
+        <label style="justify-content:flex-end"><button class="btn" type="submit">Adicionar</button></label>
+      </form>
+    </div>
+    <div class="box"><h2>Quartos</h2><div class="lista" id="listaQuartos"></div></div>
+  </section>
+
+  <section id="hospedes" hidden>
+    <div class="box"><h2>Novo hóspede</h2>
+      <form id="fHosp">
+        <label>Nome<input id="hNome" required maxlength="80"></label>
+        <label>Telefone<input id="hTel" maxlength="20" inputmode="tel"></label>
+        <label>Documento<input id="hDoc" maxlength="30"></label>
+        <label style="justify-content:flex-end"><button class="btn" type="submit">Cadastrar</button></label>
+      </form>
+    </div>
+    <div class="box"><h2>Hóspedes</h2><div class="lista" id="listaHosp"></div></div>
+  </section>
+</main>
+
+<script>
+(function(){
+  "use strict";
+  var KEY="raiz-hotel-v1";
+  var db=load();
+  function load(){
+    try{var d=JSON.parse(localStorage.getItem(KEY));if(d&&d.quartos)return d}catch(e){}
+    return {quartos:[],hospedes:[],reservas:[],seq:1};
+  }
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}}
+  function id(){return db.seq++}
+  function $(s){return document.getElementById(s)}
+  function esc(t){var d=document.createElement("div");d.textContent=t==null?"":String(t);return d.innerHTML}
+  function brl(v){return Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
+  function iso(d){var m=d.getMonth()+1,x=d.getDate();return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(x<10?"0":"")+x}
+  var hojeStr=iso(new Date());
+  $("hoje").textContent=new Date().toLocaleDateString("pt-BR");
+  function noites(a,b){return Math.round((new Date(b)-new Date(a))/864e5)}
+  function quarto(i){return db.quartos.filter(function(q){return q.id===i})[0]}
+  function hosp(i){return db.hospedes.filter(function(h){return h.id===i})[0]}
+
+  function status(q){
+    var r=db.reservas.filter(function(x){return x.quarto===q.id&&x.estado!=="cancelada"&&x.estado!=="saiu"});
+    if(r.some(function(x){return x.estado==="hospedado"}))return "ocupado";
+    if(r.some(function(x){return x.entrada<=hojeStr&&x.saida>hojeStr}))return "reservado";
+    if(q.limpeza)return "limpeza";
+    return "livre";
+  }
+  function conflito(q,a,b){
+    return db.reservas.some(function(x){
+      return x.quarto===q&&x.estado!=="cancelada"&&x.estado!=="saiu"&&a<x.saida&&b>x.entrada;
+    });
+  }
+
+  function render(){
+    // cards
+    var livres=db.quartos.filter(function(q){return status(q)==="livre"}).length;
+    var ocup=db.quartos.filter(function(q){return status(q)==="ocupado"}).length;
+    var taxa=db.quartos.length?Math.round(ocup/db.quartos.length*100):0;
+    var rec=db.reservas.filter(function(r){return r.estado==="saiu"&&r.saida.slice(0,7)===hojeStr.slice(0,7)})
+      .reduce(function(s,r){return s+r.total},0);
+    $("cards").innerHTML=
+      '<div class="card"><b>'+livres+'</b><small>Quartos livres</small></div>'+
+      '<div class="card"><b>'+ocup+'</b><small>Ocupados</small></div>'+
+      '<div class="card"><b>'+taxa+'%</b><small>Ocupação</small></div>'+
+      '<div class="card"><b>'+brl(rec)+'</b><small>Faturado no mês</small></div>';
+
+    var ch=db.reservas.filter(function(r){return r.estado==="reservada"&&r.entrada===hojeStr});
+    $("chegadas").innerHTML=ch.length?ch.map(function(r){return linha(r,true)}).join(""):'<div class="vazio">Nenhuma chegada hoje.</div>';
+    var sa=db.reservas.filter(function(r){return r.estado==="hospedado"&&r.saida<=hojeStr});
+    $("saidas").innerHTML=sa.length?sa.map(function(r){return linha(r,true)}).join(""):'<div class="vazio">Nenhuma saída hoje.</div>';
+
+    var rs=db.reservas.slice().sort(function(a,b){return a.entrada<b.entrada?-1:1});
+    $("listaReservas").innerHTML=rs.length?rs.map(function(r){return linha(r,true)}).join(""):'<div class="vazio">Nenhuma reserva ainda.</div>';
+
+    $("listaQuartos").innerHTML=db.quartos.length?db.quartos.map(function(q){
+      var s=status(q);
+      return '<div class="item"><div><b>Quarto '+esc(q.numero)+'</b> · '+esc(q.tipo)+'<br><small>'+brl(q.preco)+' / diária</small></div>'+
+        '<div><span class="tag '+s+'">'+s+'</span> '+
+        '<button class="btn peq sec" data-a="limpeza" data-id="'+q.id+'">'+(q.limpeza?"Liberar":"Limpeza")+'</button> '+
+        '<button class="btn peq perigo" data-a="delq" data-id="'+q.id+'">Excluir</button></div></div>';
+    }).join(""):'<div class="vazio">Cadastre os quartos do hotel.</div>';
+
+    $("listaHosp").innerHTML=db.hospedes.length?db.hospedes.map(function(h){
+      return '<div class="item"><div><b>'+esc(h.nome)+'</b><br><small>'+esc(h.tel||"sem telefone")+(h.doc?" · "+esc(h.doc):"")+'</small></div>'+
+        '<button class="btn peq perigo" data-a="delh" data-id="'+h.id+'">Excluir</button></div>';
+    }).join(""):'<div class="vazio">Nenhum hóspede cadastrado.</div>';
+
+    $("rHosp").innerHTML=db.hospedes.map(function(h){return '<option value="'+h.id+'">'+esc(h.nome)+'</option>'}).join("");
+    $("rQuarto").innerHTML=db.quartos.map(function(q){return '<option value="'+q.id+'">Quarto '+esc(q.numero)+' ('+esc(q.tipo)+')</option>'}).join("");
+  }
+
+  function linha(r){
+    var q=quarto(r.quarto),h=hosp(r.hospede);
+    var acao="";
+    if(r.estado==="reservada")acao='<button class="btn peq sec" data-a="in" data-id="'+r.id+'">Check-in</button> <button class="btn peq perigo" data-a="canc" data-id="'+r.id+'">Cancelar</button>';
+    else if(r.estado==="hospedado")acao='<button class="btn peq" data-a="out" data-id="'+r.id+'">Check-out</button>';
+    var cor=r.estado==="hospedado"?"ocupado":r.estado==="reservada"?"reservado":"limpeza";
+    return '<div class="item"><div><b>'+esc(h?h.nome:"?")+'</b> · Quarto '+esc(q?q.numero:"?")+
+      '<br><small>'+esc(r.entrada.split("-").reverse().join("/"))+' a '+esc(r.saida.split("-").reverse().join("/"))+
+      ' · '+noites(r.entrada,r.saida)+' noite(s) · '+brl(r.total)+'</small></div>'+
+      '<div><span class="tag '+cor+'">'+esc(r.estado)+'</span> '+acao+'</div></div>';
+  }
+
+  // abas
+  $("abas").addEventListener("click",function(e){
+    var a=e.target.getAttribute("data-aba");if(!a)return;
+    ["painel","reservas","quartos","hospedes"].forEach(function(s){$(s).hidden=s!==a});
+    Array.prototype.forEach.call($("abas").children,function(b){b.classList.toggle("on",b===e.target)});
+  });
+
+  // formulários
+  $("fQuarto").addEventListener("submit",function(e){
+    e.preventDefault();
+    var n=$("qNum").value.trim();
+    if(db.quartos.some(function(q){return q.numero===n})){alert("Já existe um quarto com esse número.");return}
+    db.quartos.push({id:id(),numero:n,tipo:$("qTipo").value,preco:parseFloat($("qPreco").value)||0,limpeza:false});
+    save();e.target.reset();render();
+  });
+  $("fHosp").addEventListener("submit",function(e){
+    e.preventDefault();
+    db.hospedes.push({id:id(),nome:$("hNome").value.trim(),tel:$("hTel").value.trim(),doc:$("hDoc").value.trim()});
+    save();e.target.reset();render();
+  });
+  $("fReserva").addEventListener("submit",function(e){
+    e.preventDefault();
+    var a=$("rIn").value,b=$("rOut").value,qid=parseInt($("rQuarto").value,10),hid=parseInt($("rHosp").value,10);
+    var m=$("rMsg");m.textContent="";
+    if(!qid||!hid){m.textContent="Cadastre ao menos um quarto e um hóspede.";return}
+    if(b<=a){m.textContent="A saída precisa ser depois da entrada.";return}
+    if(a<hojeStr){m.textContent="A entrada não pode ser no passado.";return}
+    if(conflito(qid,a,b)){m.textContent="Esse quarto já está reservado nesse período.";return}
+    var q=quarto(qid);
+    db.reservas.push({id:id(),hospede:hid,quarto:qid,entrada:a,saida:b,total:noites(a,b)*q.preco,estado:"reservada"});
+    save();e.target.reset();render();
+  });
+
+  // ações
+  document.addEventListener("click",function(e){
+    var t=e.target,a=t.getAttribute&&t.getAttribute("data-a");if(!a)return;
+    var i=parseInt(t.getAttribute("data-id"),10);
+    var r=db.reservas.filter(function(x){return x.id===i})[0];
+    if(a==="in"&&r)r.estado="hospedado";
+    else if(a==="out"&&r){r.estado="saiu";var q=quarto(r.quarto);if(q)q.limpeza=true}
+    else if(a==="canc"&&r){if(!confirm("Cancelar esta reserva?"))return;r.estado="cancelada"}
+    else if(a==="limpeza"){var qq=quarto(i);if(qq)qq.limpeza=!qq.limpeza}
+    else if(a==="delq"){
+      if(db.reservas.some(function(x){return x.quarto===i&&(x.estado==="reservada"||x.estado==="hospedado")})){alert("Esse quarto tem reservas ativas.");return}
+      if(!confirm("Excluir este quarto?"))return;
+      db.quartos=db.quartos.filter(function(x){return x.id!==i});
+    }else if(a==="delh"){
+      if(db.reservas.some(function(x){return x.hospede===i&&(x.estado==="reservada"||x.estado==="hospedado")})){alert("Esse hóspede tem reservas ativas.");return}
+      if(!confirm("Excluir este hóspede?"))return;
+      db.hospedes=db.hospedes.filter(function(x){return x.id!==i});
+    }else return;
+    save();render();
+  });
+
+  render();
+  if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(function(){});
+})();
+</script>
+</body>
+</html>
